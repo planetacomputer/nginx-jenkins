@@ -1,0 +1,34 @@
+version: '3'
+services:
+  jenkins:
+    image: "jenkins/jenkins:lts"
+    user: root
+    environment:
+      JAVA_OPTS: "-Dhudson.model.DirectoryBrowserSupport.CSP=\"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\" -Djenkins.model.DirectoryBrowserSupport.CSP=\"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\""
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - jenkins_nw
+    ports:
+      - "50000:50000"
+    restart: unless-stopped
+  nginx:
+    image: "nginx:latest"
+    links:
+      - jenkins:jenkinssvc
+    ports:
+      - "443:443"
+    volumes:
+      - ./certs:/etc/ssl
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx-logs:/var/log/nginx
+    networks:
+      - jenkins_nw
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+networks:
+  jenkins_nw:
+    driver: bridge

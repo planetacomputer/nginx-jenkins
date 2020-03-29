@@ -1,0 +1,5 @@
+jenkins-nginx/jenkins_home
+jenkins-nginx/nginx-logs/*
+jenkins-nginx/certs/*
+ubuntu-bionic-18.04-cloudimg-console.log
+.vagrant
